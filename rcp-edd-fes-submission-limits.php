@@ -170,7 +170,7 @@ add_filter( 'fes_render_submission_form_frontend_fields', 'rcp_edd_fes_submissio
  */
 function rcp_edd_fes_vendor_menu_items( $menu_items ) {
 
-	if ( rcp_edd_fes_member_at_limit() ) {
+	if ( rcp_edd_fes_member_at_limit() && array_key_exists( 'new_product', $menu_items ) ) {
 		unset( $menu_items['new_product'] );
 	}
 
