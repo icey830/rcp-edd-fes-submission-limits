@@ -10,6 +10,9 @@
 
 /**
  * Loads the plugin textdomain.
+ *
+ * @since 1.0
+ * @return void
  */
 function rcp_edd_fes_textdomain() {
 	load_plugin_textdomain( 'rcp-edd-fes-submission-limits', false, dirname( plugin_basename( __FILE__ ) ) . '/languages/' );
@@ -19,6 +22,11 @@ add_action( 'init', 'rcp_edd_fes_textdomain' );
 
 /**
  * Adds the plugin settings form fields to the subscription level form.
+ *
+ * @param object $level Subscription level object.
+ *
+ * @since 1.0
+ * @return void
  */
 function rcp_edd_fes_level_fields( $level ) {
 
@@ -48,6 +56,12 @@ add_action( 'rcp_edit_subscription_form', 'rcp_edd_fes_level_fields' );
 
 /**
  * Saves the subscription level limit settings.
+ *
+ * @param int   $level_id Subscription level ID.
+ * @param array $args     Level arguments.
+ *
+ * @since 1.0
+ * @return void
  */
 function rcp_edd_fes_save_level_limits( $level_id = 0, $args = array() ) {
 
@@ -67,11 +81,16 @@ add_action( 'rcp_edit_subscription_level', 'rcp_edd_fes_save_level_limits', 10, 
 
 /**
  * Displays a notice to the vendor on the dashboard.
+ *
+ * @param string $content Unfiltered content.
+ *
+ * @since 1.0
+ * @return string
  */
 function rcp_edd_fes_vendor_announcement( $content ) {
 
 	if ( ! function_exists( 'rcp_get_subscription_id' ) ) {
-		return;
+		return $content;
 	}
 
 	if ( rcp_edd_fes_member_at_limit() ) {
@@ -84,6 +103,13 @@ add_filter( 'fes_dashboard_content', 'rcp_edd_fes_vendor_announcement' );
 
 /**
  * Displays a notice to the vendor on the submission form screen.
+ *
+ * @param FES_Form $obj
+ * @param int      $user_id
+ * @param bool     $readonly
+ *
+ * @since 1.0
+ * @return void
  */
 function rcp_edd_fes_before_submission_form_fields( $obj, $user_id, $readonly ) {
 
@@ -100,18 +126,29 @@ add_action( 'fes_render_submission_form_frontend_before_fields', 'rcp_edd_fes_be
 
 /**
  * Constructs the vendor limit message.
+ *
+ * @since 1.0
+ * @return string
  */
 function rcp_edd_fes_vendor_at_limit_message() {
 	global $rcp_options;
 	return apply_filters(
 		'rcp_edd_fes_vendor_at_limit_message',
-		sprintf( __( 'You have published the maximum number of %s allowed by your subscription. <a href="%s">Upgrade your membership</a> to publish more.', 'rcp-edd-fes-submission-limits' ), strtolower( edd_get_label_plural() ), get_permalink( $rcp_options['registration_page'] ) )
+		sprintf( __( 'You have published the maximum number of %s allowed by your subscription. <a href="%s">Upgrade your membership</a> to publish more.', 'rcp-edd-fes-submission-limits' ), strtolower( edd_get_label_plural() ), esc_url( get_permalink( $rcp_options['registration_page'] ) ) )
 	);
 }
 
 
 /**
  * Overrides the submission form fields when a vendor is at the submission limit.
+ *
+ * @param array    $fields
+ * @param FES_Form @obj
+ * @param int      $user_id
+ * @param bool     $readonly
+ *
+ * @since 1.0
+ * @return array
  */
 function rcp_edd_fes_submission_form_override( $fields, $obj, $user_id, $readonly ) {
 	if ( rcp_edd_fes_member_at_limit() && isset( $_GET['task'] ) && 'edit-product' !== $_GET['task'] ) {
@@ -125,6 +162,11 @@ add_filter( 'fes_render_submission_form_frontend_fields', 'rcp_edd_fes_submissio
 
 /**
  * Removes the New Product menu item from the vendor dashboard when the vendor is at the submission limit.
+ *
+ * @param array $menu_items
+ *
+ * @since 1.0
+ * @return array
  */
 function rcp_edd_fes_vendor_menu_items( $menu_items ) {
 
@@ -139,6 +181,13 @@ add_filter( 'fes_vendor_dashboard_menu', 'rcp_edd_fes_vendor_menu_items' );
 
 /**
  * Updates the vendor's total submission count.
+ *
+ * @param FES_Form $obj
+ * @param int      $user_id
+ * @param int      $save_id
+ *
+ * @since 1.0
+ * @return void
  */
 function rcp_edd_fes_save_submission_count( $obj, $user_id, $save_id ) {
 
@@ -154,11 +203,16 @@ add_action( 'fes_save_submission_form_values_after_save', 'rcp_edd_fes_save_subm
 
 /**
  * Determines if the member is at the product submission limit.
+ *
+ * @param int $user_id
+ *
+ * @since 1.0
+ * @return bool
  */
 function rcp_edd_fes_member_at_limit( $user_id = 0 ) {
 
 	if ( ! function_exists( 'rcp_get_subscription_id' ) ) {
-		return;
+		return false;
 	}
 
 	if ( empty( $user_id ) ) {
@@ -183,6 +237,13 @@ function rcp_edd_fes_member_at_limit( $user_id = 0 ) {
 
 /**
  * Resets a vendor's product submission count when making a new payment.
+ *
+ * @param int       $payment_id
+ * @param array     $args
+ * @param int|float $amount
+ *
+ * @since 1.0
+ * @return void
  */
 function rcp_edd_fes_reset_limit( $payment_id, $args = array(), $amount ) {
 
